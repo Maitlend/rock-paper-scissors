@@ -1,96 +1,117 @@
-game();
+//Move constants
+const ROCK = "ROCK";
+const PAPER = "PAPER";
+const SCISSORS = "SCISSORS";
 
-function game(){
-  let playerScore = 0;
-  let computerScore = 0;
-  let playerSelection;
-  let computerSelection;
-  let roundResult;
+//new ui features
+const rockButton = document.getElementById('rock');
+const paperButton = document.getElementById('paper');
+const scissorsButton = document.getElementById('scissors');
 
-  for(let i = 0; i < 5; i++){
-    if(playerScore > 2 || computerScore > 2){
-      break;
-    }
-    playerSelection = getPlayerChoice();
-    computerSelection = getComputerChoice();
+const playerSelectionDisplay = document.getElementById('player-selection');
+const computerSelectionDisplay = document.getElementById('computer-selection');
+const resultDisplay = document.getElementById('result');
+const playerScoreDisplay = document.getElementById('player-score');
+const computerScoreDisplay = document.getElementById('computer-score');
 
-    console.log(`Round: ${i+1} => Player: ${playerSelection}, Computer: ${computerSelection}`);
-    roundResult = playRound(playerSelection,computerSelection);
+rockButton.addEventListener("click", playRound.bind(this, ROCK));
+paperButton.addEventListener("click", playRound.bind(this, PAPER));
+scissorsButton.addEventListener("click", playRound.bind(this, SCISSORS));
 
-    if(roundResult === 'PLAYER'){
-      playerScore++;
-      alert(`You win! ${playerSelection} beats ${computerSelection}`);
-    }
-    else if(roundResult === 'COMPUTER'){
-      computerScore++;
-      alert(`You lose! ${computerSelection} beats ${playerSelection}`);
-    }
-    else{
-      alert(`It's a tie! both chose ${playerSelection}`);
-    }
+let playerScore = 0;
+let computerScore = 0;
+updateDisplay();
+
+function playRound(playerSelection){
+  const computerSelection = getComputerChoice();
+  console.log(playerSelection);
+  console.log(computerSelection);
+
+  if(playerSelection === computerSelection){
+    updateDisplay("TIE", playerSelection, computerSelection);
+    return;
   }
-  if(playerScore>computerScore){
-    alert(`Player wins the game!\n Player score: ${playerScore}, Computer score: ${computerScore}`);
-  }
-  else if(computerScore>playerScore){
-    alert(`Computer wins the game!\n Player score: ${playerScore}, Computer score: ${computerScore}`);
-  }
-  else{
-    alert(`It's a tie\n Player score: ${playerScore}, Computer score: ${computerScore}`);
-  }
-}
 
-function playRound(playerSelection, computerSelection){
   switch (playerSelection.toUpperCase()){
     case 'ROCK':
       if(computerSelection === 'PAPER'){
-        return 'COMPUTER';
+        updateDisplay('COMPUTER', playerSelection, computerSelection);
       }
       else if(computerSelection === 'SCISSORS'){
-        return 'PLAYER';
+        updateDisplay("PLAYER", playerSelection, computerSelection);
       }
       break;
     case 'PAPER':
       if(computerSelection === 'ROCK'){
-        return 'PLAYER';
+        updateDisplay("PLAYER", playerSelection, computerSelection);
       }
       else if(computerSelection === 'SCISSORS'){
-        return 'COMPUTER';
+        updateDisplay("COMPUTER", playerSelection, computerSelection);
       }
       break;
     case 'SCISSORS':
       if(computerSelection === 'ROCK'){
-        return 'COMPUTER';
+        updateDisplay("COMPUTER", playerSelection, computerSelection);
       }
       else if(computerSelection === 'PAPER'){
-        return 'PLAYER';
+        updateDisplay("PLAYER", playerSelection, computerSelection);
       }
       break;
   }
-  return 'TIE';
+  if(playerScore === 5 || computerScore === 5){
+    console.log("Game Over!");
+    gameOver();
+  }
 }
 
 function getComputerChoice(){
   const randNum = Math.random()*100;
   if(randNum <= 100/3){
-    return "ROCK";
+    return ROCK;
   }
   else if(randNum <= 200/3){
-    return "PAPER";
+    return PAPER;
   }
   else{
-    return "SCISSORS";
+    return SCISSORS;
   }
 }
 
-function getPlayerChoice(){
-  let playerChoice;
-  while(true){
-    playerChoice = prompt("Please select rock, paper, or scissors: ").toUpperCase();
-    if(playerChoice === 'ROCK' || playerChoice === 'PAPER' || playerChoice === 'SCISSORS'){
-      break;
-    }
-    alert(`'${playerChoice} is invalid, please enter a valid move`);
+function updateDisplay(result, playerSelection, computerSelection){
+  playerSelectionDisplay.textContent = `Player chooses: ${playerSelection}`;
+  computerSelectionDisplay.textContent = `Computer chooses: ${computerSelection}`;
+
+  if(result === 'PLAYER'){
+    resultDisplay.textContent = `Result: You win! ${playerSelection} beats ${computerSelection}`;
+    playerScore++;
+    playerScoreDisplay.textContent = `Player Score: ${playerScore}`;
   }
-  return playerChoice;
+  else if(result === 'COMPUTER'){
+    resultDisplay.textContent = `Result: You lose! ${computerSelection} beats ${playerSelection}`;
+    computerScore++;
+    computerScoreDisplay.textContent = `Computer Score: ${computerScore}`;
+  }
+  else if(result === 'TIE'){
+    resultDisplay.textContent = `Result: It's a tie! Both chose ${playerSelection}`;
+  }
+  else{ 
+    playerSelectionDisplay.textContent = `Player chooses: `;
+    computerSelectionDisplay.textContent = `Computer chooses: `;
+    resultDisplay.textContent = `Result: Make a move!`;
+    playerScoreDisplay.textContent = `Player Score: ${playerScore}`;
+    computerScoreDisplay.textContent = `Computer Score: ${computerScore}`;
+  }
+}
+
+function gameOver(){
+  if(playerScore === 5){
+    resultDisplay.textContent = `Result: Player wins the game!`;
+    alert(`Player wins the game with a score of ${playerScore}!`);
+  }
+  else{
+    resultDisplay.textContent = `Result: Computer wins the game!`;
+    alert(`Computer wins the game with a score of ${computerScore}!`);
+  }
+    playerScore = computerScore = 0;
+    updateDisplay();
 }
